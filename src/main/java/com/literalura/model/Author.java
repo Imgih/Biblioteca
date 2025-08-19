@@ -13,7 +13,7 @@ public class Author {
     @Column(nullable = false)
     private String name;
 
-    // podem ser nulos se a API não trouxer
+
     private Integer birthYear;
     private Integer deathYear;
 

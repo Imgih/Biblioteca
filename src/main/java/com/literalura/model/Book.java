@@ -18,14 +18,14 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // id do catálogo do Project Gutenberg (virá da API)
+
     @Column
-    private Long gutenbergId; // pode ser null nos testes manuais
+    private Long gutenbergId;
 
     @Column(nullable = false, length = 500)
     private String title;
 
-    // vamos manter apenas o PRIMEIRO idioma retornado pela API
+
     @Column(nullable = false, length = 10)
     private String language;
 
