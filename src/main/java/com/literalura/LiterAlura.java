@@ -35,6 +35,7 @@ public class LiterAlura implements CommandLineRunner {
                 case 3 -> listarAutores();
                 case 4 -> listarAutoresVivos(sc);
                 case 5 -> listarLivrosPorIdioma(sc);
+                case 6 -> top10Api(sc);
                 case 0 -> System.out.println("saindo...");
                 default -> System.out.println("Entrada inválida. Tente novamente.");
             }
@@ -50,6 +51,7 @@ public class LiterAlura implements CommandLineRunner {
                 3- Listar autores registrados
                 4- Listar autores vivos em um determinado ano
                 5- Listar livros em um determinado idioma
+                6- Top 10 
                 0- sair
                 """);
     }
@@ -113,5 +115,25 @@ public class LiterAlura implements CommandLineRunner {
         var list = catalog.listBooksByLanguage(sc.nextLine().trim());
         if (list.isEmpty()) { System.out.println("Nenhum livro nesse idioma.\n"); return; }
         for (Book b : list) imprimirCardLivro(b);
+    }
+    private void top10Api(Scanner sc) {
+        System.out.print("Salvar esses 10 no banco? (s/n): ");
+        boolean salvar = sc.nextLine().trim().equalsIgnoreCase("s");
+
+        var list = catalog.top10FromApi(salvar);
+        if (list.isEmpty()) {
+            System.out.println("Não foi possível obter dados da API.\n");
+            return;
+        }
+
+        System.out.println("\n--- Top 10 livros por downloads  ---");
+        int i = 1;
+        for (Book b : list) {
+            String autor = b.getAuthor() != null ? b.getAuthor().getName() : "-";
+            Integer dl = b.getDownloadCount() != null ? b.getDownloadCount() : 0;
+            System.out.printf("%d) %s | %s | %s | %d%n",
+                    i++, b.getTitle(), autor, b.getLanguage(), dl);
+        }
+        System.out.println("-----------------------------------------\n");
     }
 }

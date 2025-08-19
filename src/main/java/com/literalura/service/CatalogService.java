@@ -53,6 +53,40 @@ public class CatalogService {
 
         return Optional.of(bookRepo.save(book));
     }
+    public List<Book> top10FromApi(boolean salvarNoBanco) {
+        List<GutendexBook> api = client.fetchPopularPage(1);
+        if (api.isEmpty()) return List.of();
+
+        api = api.stream().limit(10).toList();
+        List<Book> result = new java.util.ArrayList<>();
+
+        for (GutendexBook dto : api) {
+            String lang = (dto.languages() != null && !dto.languages().isEmpty())
+                    ? dto.languages().get(0) : "unknown";
+
+            GutendexAuthors a = (dto.authors() != null && !dto.authors().isEmpty())
+                    ? dto.authors().get(0) : null;
+
+            String name = (a != null && a.name() != null) ? a.name() : "Autor Desconhecido";
+            Author author = authorRepo.findByNameIgnoreCase(name).orElseGet(() ->
+                    authorRepo.save(new Author(
+                            name,
+                            a != null ? a.birth_year() : null,
+                            a != null ? a.death_year() : null)));
+
+            Book b = new Book(dto.id(), dto.title(), lang,
+                    dto.download_count() != null ? dto.download_count() : 0,
+                    author);
+
+            if (salvarNoBanco) {
+                if (dto.id() != null && bookRepo.findByGutenbergId(dto.id()).isEmpty()) {
+                    b = bookRepo.save(b);
+                }
+            }
+            result.add(b);
+        }
+        return result;
+    }
 
     // consultas usadas no menu
     public List<Book> listAllBooks() { return bookRepo.findAll(); }
